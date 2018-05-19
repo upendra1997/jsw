@@ -3,8 +3,9 @@ const {feedbackSchema} = require('./feedback');
 const {historySchema} = require('./history');
 const {orderSchema} = require('./order');
 const {userSchema} = require('./user');
+const {env} = require('../config');
 
-mongoose.connect('mongodb://localhost/Test');
+mongoose.connect(env["database_url"]);
 
 const User = mongoose.model('users', userSchema);
 const Feedback = mongoose.model('feedbacks', feedbackSchema);
