@@ -51,6 +51,9 @@ const userSchema = new Schema({
         trim: true,
         required: true,
     },
+    history: [{
+        type: Schema.Types.Mixed,
+    }],
     members: {
         type: [Schema.Types.ObjectId],
     },

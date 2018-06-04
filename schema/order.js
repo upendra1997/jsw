@@ -1,4 +1,5 @@
 const {Schema} = require('mongoose');
+const validator = require('validator');
 
 const orderSchema = new Schema({
     userId: {
@@ -10,10 +11,8 @@ const orderSchema = new Schema({
         required: true,
         lowercase: true,
         trim: true,
-        default: 'TODO',
         minlength: 1,
         maxlength: 512,
-        required: true,
     },
     materialType: {
         type: String,
@@ -22,13 +21,28 @@ const orderSchema = new Schema({
     status: {
         type: String,
         default: 'NotVerified',
-        enum: ['NotVerified', 'Packaging',],
+        enum: ['NotVerified', 'Packaging',], //TODO: add more statuses
         required: true,
     },
     quantity: {
         type: String,
         required: true,
     },
+    location: {
+        type: String,
+    },
+    driver: {
+        name: {
+            type: String,
+        },
+        contact: {
+            type: String,
+            validate: {
+                validator: v => validator.isMobilePhone(v, 'any'),
+                message: "Not a valid mobile number"
+            },
+        }
+    }
 });
 
 
