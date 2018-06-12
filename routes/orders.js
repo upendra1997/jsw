@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/history', authenticate, function (req, res) {
     const user = req.user;
     if (user.history)
-        res.send(user.history);
+        res.send(user.history.reverse());
     else
         res.send({});
 });
@@ -46,7 +46,7 @@ router.get('/', authenticate, function (req, res) {
 
 router.post('/', authenticate, function (req, res, next) {
     const id = req.user._id;
-    let data = _.pick(req.body, ['address', 'materialType', 'quantity']);
+    let data = _.pick(req.body, ['address', 'materialType', 'quantity','contact','pincode','GST','name']);
     User.findById(id).then((user) => {
         if (!data.address)
             data.address = user.address;
@@ -57,6 +57,7 @@ router.post('/', authenticate, function (req, res, next) {
         order.save().then((doc) => {
             console.log("Order Saved");
             data.message = "Object Created";
+            data._id = order._id;
             req.HISTORY = data;
             res.send({message: "Order Created"});
             next();
@@ -85,6 +86,7 @@ router.put('/:id', authenticate, function (req, res, next) {
         data
     }).then((doc) => {
         res.send(doc);
+        data._id = orderId;
         data.message = "Order Updated";
         req.HISTORY = data;
         next();
@@ -104,13 +106,32 @@ router.delete('/:id', authenticate, function (req, res, next) {
         },
         _id: orderId,
     }).remove((doc) => {
-        res.send(doc);
+        res.send(JSON.stringify(doc));
         data.message = "Order Deleted";
+        data._id = orderId;
         req.HISTORY = data;
         next();
     }).catch((e) => {
         res.status(505).send(e);
     });
 }, logHistory);
+
+router.get('/track', authenticate, function (req, res) {
+    const id = req.user._id;
+    Order.find({
+        status: {
+            $ne: 'NotVerified',
+        },
+        userId: id
+    }).sort({
+        '_id': -1
+    }).then((data) => {
+        console.log(data);
+        res.send(data);
+    }).catch((e) => {
+        res.status(505).send(e);
+    });
+});
+
 
 module.exports = router;

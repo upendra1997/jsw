@@ -18,6 +18,28 @@ const orderSchema = new Schema({
         type: String,
         required: true,
     },
+    pincode:{
+        type: Number,
+        required: true,
+        minlength: 6,
+        maxlength: 6,
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+    contact: {
+        type: String,
+        required: true,
+        unique: true,
+        validate: {
+            validator: v => validator.isMobilePhone(v, 'any'),
+            message: "Not a valid mobile number"
+        },
+    },
+    GST:{
+        type: String,
+    },
     status: {
         type: String,
         default: 'NotVerified',

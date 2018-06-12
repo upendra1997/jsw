@@ -1,7 +1,6 @@
 const logHistory = (req, res) => {
-    console.log("Well");
     console.log(req.HISTORY.message);
-    req.HISTORY.date = new Date();
+    req.HISTORY.date = String(new Date());
     req.user.update({
         $push: {
             history: req.HISTORY,
