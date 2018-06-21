@@ -1,0 +1,7 @@
+{
+  "secret":"abc123",
+  "host":"localhost",
+  "port": "5000",
+  "MONGODB_URI":"mongodb://localhost/Test",
+  "database_port":"27017"
+}
