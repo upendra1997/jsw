@@ -6,7 +6,8 @@
     "start": "npm run server& npm run client",
     "client": "cd client && npm start",
     "server": "nodemon ./bin/www",
-    "database": "mongod --dbpath ./database &"
+    "database": "mongod --dbpath ./database &",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
