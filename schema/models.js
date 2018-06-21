@@ -4,7 +4,7 @@ const {orderSchema} = require('./order');
 const {userSchema} = require('./user');
 const {env} = require('../config');
 
-mongoose.connect(env["database_url"]);
+mongoose.connect(env["MONGODB_URI"]);
 
 const User = mongoose.model('users', userSchema);
 const Feedback = mongoose.model('feedbacks', feedbackSchema);
