@@ -1,17 +1,8 @@
 import React from "react";
 import validator from "validator";
+import _ from 'lodash';
 
 class Login extends React.Component {
-    constructor(prop) {
-        super(prop);
-        this.state = {
-            email: '',
-            password: '',
-            errors: new Set(),
-            messages: new Set(),
-        };
-    }
-
     handleLogin = (action)=> {
         action.preventDefault();
         if(!(this.state.email && this.state.password) || this.state.errors.size)
@@ -25,18 +16,22 @@ class Login extends React.Component {
         }).then(response => {
             return response.json();
         }).then(body => {
+            const user = _.pick(body.user, ['_id', 'address', 'contact', 'email', 'kind', 'members', 'name', 'status']);
+            console.log(user);
             if (body.error)
-                messages.add(body.error)
+                messages.add(body.error);
             if (body.message)
                 messages.add(body.message);
             this.setState({messages: messages});
+            console.log(this.props);
+            this.props.setUser(user);
         }).catch(e => {
+            console.log(e.stack);
             messages.add("Please fill details properly.");
             messages.add(e);
             this.setState({messages: messages});
         });
-    }
-
+    };
     handlePasswordChange = (evt)=>{
         const message = "Password is not valid";
         let errors = new Set(this.state.errors);
@@ -49,8 +44,7 @@ class Login extends React.Component {
             password: evt.target.value,
             errors: errors,
         });
-    }
-
+    };
     handleEmailChange = (evt)=>{
         const message = "Not a valid email.";
         let errors = new Set(this.state.errors);
@@ -64,6 +58,17 @@ class Login extends React.Component {
             email: evt.target.value,
             errors: errors
         });
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            email: '',
+            password: '',
+            errors: new Set(),
+            messages: new Set(),
+        };
+        this.props = props;
     }
 
     render() {

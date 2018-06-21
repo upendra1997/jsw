@@ -51,7 +51,33 @@ class Welcome extends React.Component {
         });
 
         return (<div>
-            Welcome {this.state.name}
+            <h1>Welcome {this.props.user.name}</h1>
+            <h2>to JSW Dealer and Sub-Dealer Portal</h2>
+            <img src={window.location.origin + '/favicon.png'} height={200} width={200}/>
+            <br/>
+            <br/>
+            <div className={"card col-md-8 col-xl-11 bg-dark"} style={{color: 'white'}} align="left">
+                <h3>Contact Us:</h3>
+                <h5>
+                    <label>Name:</label> <label>Upendra Upadhyay</label><br/>
+                    <label>Contact:</label> <label>9460979571</label><br/>
+                    <label>Email:</label> <label>upendra.upadhyay.97@gmail.com</label><br/>
+                    <label>Website:</label> <label><a href="www.jswcement.in">www.jswcement.in</a></label><br/>
+                </h5>
+            </div>
+            <br/>
+            <div align="right">
+                <div className={"card col-md-8 col-xl-11 bg-dark"} style={{color: 'white'}} align="left">
+                    <h3>Address:</h3>
+                    <h5>
+                        <label>
+                            <div>Babukhan Millenium Center, 6-3-1099/1100, No.702, 7th Floor, Block 'A', Somajiguuda,
+                                Hyderabad - 500082
+                            </div>
+                        </label><br/>
+                    </h5>
+                </div>
+            </div>
             <br />
             {errors}
             <br />
@@ -59,6 +85,6 @@ class Welcome extends React.Component {
             {messages}
         </div>);
     }
-};
+}
 
 export default Welcome;

@@ -3,7 +3,7 @@ const validator = require('validator');
 
 const orderSchema = new Schema({
     userId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true,
     },
     address: {
@@ -31,9 +31,8 @@ const orderSchema = new Schema({
     contact: {
         type: String,
         required: true,
-        unique: true,
         validate: {
-            validator: v => validator.isMobilePhone(v, 'any'),
+            validator: v => validator.isMobilePhone(v, 'en-IN'),
             message: "Not a valid mobile number"
         },
     },
@@ -43,7 +42,7 @@ const orderSchema = new Schema({
     status: {
         type: String,
         default: 'NotVerified',
-        enum: ['NotVerified', 'Packaging',], //TODO: add more statuses
+        enum: ['NotVerified', 'Packaging', 'On Route', 'Delivered'], //TODO: add more statuses
         required: true,
     },
     quantity: {
@@ -60,7 +59,7 @@ const orderSchema = new Schema({
         contact: {
             type: String,
             validate: {
-                validator: v => validator.isMobilePhone(v, 'any'),
+                validator: v => validator.isMobilePhone(v, 'en-IN'),
                 message: "Not a valid mobile number"
             },
         }

@@ -1,9 +1,10 @@
 const express = require('express');
-const {Order, User} = require('../schema/models');
+const {Order, User, mongoose} = require('../schema/models');
 const {_} = require('lodash');
 const {logHistory} = require('../middleware/loghistory');
 const {authenticate} = require('../middleware/authenticate');
 const router = express.Router();
+const DataFrame = require('dataframe-js').DataFrame;
 
 
 router.get('/history', authenticate, function (req, res) {
@@ -16,11 +17,14 @@ router.get('/history', authenticate, function (req, res) {
 
 router.get('/request/verify', authenticate, function (req, res) {
     const members = req.user.members || [];
+    console.log(members);
     Order.find({
         userId: {
             $in: members,
         },
-        status: 'NotVerified'
+        status: {
+            $ne: 'Delivered',
+        }
     }).then(doc => {
         res.send(doc);
     }).catch((e) => {
@@ -44,6 +48,7 @@ router.get('/', authenticate, function (req, res) {
     });
 });
 
+// Create Order
 router.post('/', authenticate, function (req, res, next) {
     const id = req.user._id;
     let data = _.pick(req.body, ['address', 'materialType', 'quantity','contact','pincode','GST','name']);
@@ -62,7 +67,7 @@ router.post('/', authenticate, function (req, res, next) {
             res.send({message: "Order Created"});
             next();
         }).catch((e) => {
-            res.status(500).send({"error": e});
+            res.status(500).send({"error": e.message});
             console.log("Order not saved " + e);
         });
     }).catch((e) => {
@@ -71,21 +76,25 @@ router.post('/', authenticate, function (req, res, next) {
     });
 }, logHistory);
 
+
+//Update Order
 router.put('/:id', authenticate, function (req, res, next) {
     const userId = req.user._id;
     const orderId = req.params["id"];
     const data = _.pick(req.body, ['location', 'status', 'driver']);
     console.log(data);
-    let members = User.findById(userId).members || [];
+    let members = req.user.members || [];
     Order.find({
         userId: {
             $in: members,
         },
         _id: orderId,
     }).update({
-        data
+        status: data.status,
+        location: data.location,
+        driver: data.driver,
     }).then((doc) => {
-        res.send(doc);
+        res.send({message: 'Order ' + orderId + ' updated'});
         data._id = orderId;
         data.message = "Order Updated";
         req.HISTORY = data;
@@ -95,6 +104,8 @@ router.put('/:id', authenticate, function (req, res, next) {
     });
 }, logHistory);
 
+
+//Delete Order
 router.delete('/:id', authenticate, function (req, res, next) {
     const userId = req.user._id;
     const orderId = req.params["id"];
@@ -131,6 +142,20 @@ router.get('/track', authenticate, function (req, res) {
     }).catch((e) => {
         res.status(505).send(e);
     });
+});
+
+router.get('/download', authenticate, function (req, res) {
+    Order.find({
+        userId: req.user._id,
+        status: "NotVerified",
+    }).sort({
+        '_id': -1
+    }).then((data) => {
+        console.log(data);
+        const df = new DataFrame(data, ['_id', 'name', 'address', 'pincode', 'contact', 'GST', 'materialType', 'quantity', 'status', 'location', 'driver.name', 'driver.contact']);
+        df.toCSV(true, __dirname + '/a.csv');
+        res.download(__dirname + '/a.csv', 'Download');
+    }).catch((e) => res.send({error: e}));
 });
 
 

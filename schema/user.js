@@ -30,7 +30,7 @@ const userSchema = new Schema({
         required: true,
         unique: true,
         validate: {
-            validator: v => validator.isMobilePhone(v, 'any'),
+            validator: v => validator.isMobilePhone(v, 'en-IN'),
             message: "Not a valid mobile number"
         },
     },
@@ -55,10 +55,10 @@ const userSchema = new Schema({
         type: Schema.Types.Mixed,
     }],
     members: {
-        type: [Schema.Types.ObjectId],
+        type: [String],
     },
     owner: {
-        type: Schema.Types.ObjectId,
+        type: String,
     },
     kind: {
         type: String,
@@ -140,6 +140,7 @@ userSchema.pre('save', function (next) {
     // This middleware will run every time save() is called, we don't want to hash our password again and again. that's why isModified.
     if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
+            console.log("password " + user.password);
             bcrypt.hash(user.password, salt, (err, hash) => {
                 user.password = hash;
                 console.log(hash);

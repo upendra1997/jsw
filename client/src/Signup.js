@@ -2,20 +2,6 @@ import React from "react";
 import validator from 'validator';
 
 class Signup extends React.Component {
-    constructor(prop) {
-        super(prop);
-        this.state = {
-            name: '',
-            email: '',
-            address: '',
-            contact: '',
-            password: '',
-            password1: '',
-            errors: new Set(),
-            messages: new Set(),
-        };
-    }
-
     handleSignup = (action) => {
         action.preventDefault();
         if(!(this.state.name && this.state.email && this.state.contact && this.state.address && this.state.password && this.state.password1) || this.state.errors.size)
@@ -30,7 +16,7 @@ class Signup extends React.Component {
             return response.json()
         }).then(body => {
             if (body.error)
-                messages.add(body.error)
+                messages.add(body.error);
             if (body.message)
                 messages.add(body.message);
             this.setState({messages: messages});
@@ -39,8 +25,7 @@ class Signup extends React.Component {
             messages.add(e);
             this.setState({messages: messages});
         });
-    }
-
+    };
     handleNameChange = (evt)=>{
         const message = "Please fill Name.";
         let errors = new Set(this.state.errors);
@@ -54,8 +39,7 @@ class Signup extends React.Component {
             name: evt.target.value,
             errors: errors,
         });
-    }
-
+    };
     handleEmailChange = (evt)=>{
         const message = "Not a valid email.";
         let errors = new Set(this.state.errors);
@@ -69,8 +53,7 @@ class Signup extends React.Component {
             email: evt.target.value,
             errors: errors
         });
-    }
-
+    };
     handleAddressChange = (evt)=>{
         const message = "Please fill address.";
         let errors = new Set(this.state.errors);
@@ -84,8 +67,7 @@ class Signup extends React.Component {
             address: evt.target.value,
             errors: errors,
         });
-    }
-
+    };
     handleContactChange = (evt)=>{
         const message = "Not a valid contact number.";
         let errors = new Set(this.state.errors);
@@ -99,9 +81,7 @@ class Signup extends React.Component {
             contact: evt.target.value,
             errors: errors,
         });
-    }
-
-
+    };
     handlePasswordChange = (evt)=>{
         const message = "Password is not valid";
         let errors = new Set(this.state.errors);
@@ -115,8 +95,7 @@ class Signup extends React.Component {
             password: evt.target.value,
             errors: errors,
         });
-    }
-
+    };
     handlePassword1Change = (evt)=>{
         const message = "Password is not valid";
         let errors = new Set(this.state.errors);
@@ -129,6 +108,26 @@ class Signup extends React.Component {
             password1: evt.target.value,
             errors: errors,
         });
+    };
+    handleKindChange = (evt) => {
+        this.setState({
+            kind: evt.target.value,
+        });
+    };
+
+    constructor(prop) {
+        super(prop);
+        this.state = {
+            name: '',
+            email: '',
+            address: '',
+            contact: '',
+            password: '',
+            password1: '',
+            kind: 'admin',
+            errors: new Set(),
+            messages: new Set(),
+        };
     }
 
     render() {
@@ -171,6 +170,15 @@ class Signup extends React.Component {
                             <div className={"form-group col-md-6"} align="left">
                                 <label htmlFor="password1">Retype Password</label>
                                 <input type={"password"} id="password1" className={"form-control"} placeholder={"Retype Password"} name={"password1"} value={this.state.password1} onChange={this.handlePassword1Change}/>
+                            </div>
+                            <div className={"form-group col-md-6"} align="left">
+                                <label htmlFor="kind">User Type</label>
+                                <select className={"form-control"} id={"kind"} name={"kind"} value={this.state.kind}
+                                        onChange={this.handleKindChange}>
+                                    <option value="admin">Admin</option>
+                                    <option value="dealer">Dealer</option>
+                                    <option value="sub-dealer">Sub Dealer</option>
+                                </select>
                             </div>
                             <button type={"submit"} className={"btn btn-primary"}>Signup</button>
                         </form>

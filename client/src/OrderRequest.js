@@ -1,6 +1,108 @@
 import React from "react";
+import Dropzone from 'react-dropzone';
+import DataFrame from 'dataframe-js';
+import validator from "validator";
 
 class OrderRequest extends React.Component {
+    updateOrder = (id, index)=> {
+        return (action) => {
+            action.preventDefault();
+            const data = this.state.list[index];
+            let errors = new Set(this.state.errors);
+            let messages = new Set(this.state.messages);
+            fetch('/order/' + id, {
+                body: JSON.stringify(data),
+                method: 'put',
+                headers: {'Content-Type': 'application/json'},
+                credentials: 'include',
+            }).then(response => {
+                return response.json();
+            }).then(body => {
+                if (body.error)
+                    messages.add(body.error);
+                if (body.message)
+                    messages.add(body.message);
+                console.log(messages);
+                this.setState({messages: messages});
+            }).catch(e => {
+                messages.add("Please fill details properly.");
+                messages.add(e);
+                this.setState({messages: messages});
+            });
+        };
+    };
+    handleStatusChange = (index)=> {
+        return (evt)=>{
+            let list = this.state.list.slice();
+            list[index].status = evt.target.value;
+            this.setState({
+                list: list
+            });
+        }
+    };
+    handleLocationChange = (index)=> {
+        return (evt)=>{
+            let list = this.state.list.slice();
+            list[index].location = evt.target.value;
+            this.setState({
+                list: list
+            });
+        }
+    };
+    handleDriverNameChange = (index)=> {
+        return (evt)=>{
+            let list = this.state.list.slice();
+            list[index].driver.name = evt.target.value;
+            this.setState({
+                list: list
+            });
+        }
+    };
+    handleDriverContactChange = (index)=> {
+        return (evt)=>{
+            let list = this.state.list.slice();
+            const message = "Not a valid contact number.";
+            let errors = new Set(this.state.errors);
+            if (!validator.isMobilePhone(evt.target.value, 'en-IN')) {
+                errors.add(message);
+            }
+            else {
+                errors.delete(message);
+            }
+            list[index].driver.contact = evt.target.value;
+            this.setState({
+                list: list,
+                errors: errors,
+            });
+        }
+    };
+    handleDownload = (evt) => {
+        evt.preventDefault();
+        fetch('/order/download', {
+            method: 'get',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include',
+        }).then((response => {
+            return response.blob();
+        })).then((blob) => {
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = "filename.csv";
+            a.click();
+        });
+    };
+    batchUpdate = (evt) => {
+        evt.preventDefault();
+        for (let i = 0; i < this.state.list.length; i++) {
+            console.log(this.state.list[i]);
+            this.updateOrder(this.state.list[i]._id, i)({
+                preventDefault: function () {
+                }
+            });
+        }
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -9,7 +111,7 @@ class OrderRequest extends React.Component {
             messages: new Set(),
         };
         let errors = new Set(this.state.errors);
-        fetch('/order', {
+        fetch('/order/request/verify', {
             method: 'get',
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
@@ -33,81 +135,35 @@ class OrderRequest extends React.Component {
         });
     }
 
-    updateOrder = (id, index)=> {
-        return (action) => {
-            action.preventDefault();
-            const data = this.state.list[index];
-            let errors = new Set(this.state.errors);
-            let messages = new Set(this.state.messages);
-            fetch('/order/' + id, {
-                body: JSON.stringify(data),
-                method: 'put',
-                headers: {'Content-Type': 'application/json'},
-                credentials: 'include',
-            }).then(response => {
-                return response.json();
-            }).then(body => {
-                if (body.error)
-                    console.log(body.error);
-                if (body.message)
-                    alert(body.message)
-            }).catch(e => {
-                console.log("Please fill details properly.");
-            });
-        };
-    }
-
-
-    handleStatusChange = (index)=> {
-        return (evt)=>{
-            let list = this.state.list.slice();
-            list[index].status = evt.target.value;
-            this.setState({
-                list: list
-            });
-        }
-    }
-
-    handleLocationChange = (index)=> {
-        return (evt)=>{
-            let list = this.state.list.slice();
-            list[index].location = evt.target.value;
-            this.setState({
-                list: list
-            });
-        }
-    }
-
-    handleDriverNameChange = (index)=> {
-        return (evt)=>{
-            let list = this.state.list.slice();
-            list[index].driver.name = evt.target.value;
-            this.setState({
-                list: list
-            });
-        }
-    }
-
-    handleDriverContactChange = (index)=> {
-        return (evt)=>{
-            let list = this.state.list.slice();
-            list[index].driver.contact = evt.target.value;
-            this.setState({
-                list: list
-            });
-        }
+    onDrop(acceptedFiles, rejectedFiles) {
+        DataFrame.fromCSV(acceptedFiles[0]).then(df => {
+            const data = df.toCollection();
+            const list = this.state.list;
+            for (const item of data) {
+                let i = list.findIndex(a => a._id === data._id);
+                if (i == -1) continue;
+                list[i].status = data[i].status;
+                list[i].location = data[i].location;
+                list[i].driver = {name: '', contact: ''};
+                list[i].driver.name = data[i]["driver.name"];
+                list[i].driver.contact = data[i]["driver.contact"];
+            }
+            console.log(list);
+            console.log(data);
+            this.setState({list: list});
+        });
     }
 
     render() {
 
         const errors = [];
         this.state.errors.forEach((error)=>{
-            errors.push((<li key={error}>{error}</li>));
+            errors.push((<div className={"alert alert-danger"}>{error}</div>));
         });
 
         const messages = [];
         this.state.messages.forEach((error)=>{
-            messages.push((<li key={error}>{error}</li>));
+            messages.push((<div className={"alert alert-info"}>{error}</div>));
         });
         const that = this;
 
@@ -165,6 +221,24 @@ class OrderRequest extends React.Component {
                     <div className={"card-body"}>
                         <div className={"card-columns"}>
                             {list}
+                        </div>
+                        <div className={"card-footer"}>
+                            <div className={"form-group"}>
+                                <div className={"row"}>
+                                    <div className={"col"}>
+                                        <input type={"button"} className={"btn btn-dark"} value={"Download CSV"}
+                                               onClick={this.handleDownload}/>
+                                    </div>
+                                    <div className={"col"}>
+                                        <Dropzone className={"btn btn-dark"}
+                                                  onDrop={(files) => this.onDrop(files)}>{"Uplaod CSV"}</Dropzone>
+                                    </div>
+                                    <div className={"col"}>
+                                        <input type={"button"} className={"btn btn-dark"} value={"Batch Update"}
+                                               onClick={this.batchUpdate}/>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

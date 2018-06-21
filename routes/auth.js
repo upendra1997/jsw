@@ -29,7 +29,9 @@ router.post('/login', function (req, res) {
         if (user.status === "NotVerified") { //TODO: change to verified.
             user.generateToken().then((token) => {
                 res.setHeader('Set-Cookie', ['x-auth=' + token]);
-                res.header('x-auth', token).send({message: "User Logged in."});
+                user = _.pick(user, ['_id', 'address', 'contact', 'email', 'kind', 'members', 'name', 'status']);
+                console.log(user);
+                res.header('x-auth', token).send({user, message: "User Logged in."});
             }).catch((e) => {
                 console.log("Error generating Tokens :", e);
                 res.status(500).send({error: "Error generating Tokens"});
@@ -43,6 +45,45 @@ router.post('/login', function (req, res) {
         res.status(404).send({error: "User not found."})
     });
 });
+
+router.post('/check', authenticate, function (req, res) {
+    const data = _.pick(req.body, ['email', 'password']);
+    console.log(data);
+    User.findByCredentials(data.email, data.password).then(function (user) {
+        if (user.status === "NotVerified") { //TODO: change to verified
+            res.status(200).send({message: 'user exists'});
+        }
+        else {
+            res.status(401).send({error: "User Not Verified"});
+        }
+    }).catch((e) => {
+        console.log("User Not Found :", e);
+        res.status(404).send({error: "User not found."})
+    });
+});
+
+router.post('/changepassword', authenticate, function (req, res) {
+    const data = _.pick(req.body, ['email', 'password']);
+    const user = req.user;
+    console.log("password entered " + data.password);
+    user.password = data.password;
+    user.save();
+    res.status(200).send({message: 'Password Changed'})
+});
+
+
+router.get('/info/:id', function (req, res) {
+    const id = req.params["id"];
+    User.findById(id).then((user) => {
+        const a = _.pick(user, ['name', 'email', 'contact', 'address', 'kind', 'members']);
+        console.log(user.name + " " + id + " " + user.members);
+        res.status(200).send(a);
+    }).catch((e) => {
+        console.log(e.message);
+        res.status(404).send({error: e.message});
+    });
+});
+
 
 router.post('/logout', authenticate, (req, res) => {
     req.user.removeToken(req.token).then(() => {
