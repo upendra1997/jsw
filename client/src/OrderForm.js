@@ -1,6 +1,31 @@
 import React from "react";
 import validator from "validator";
 
+class OptionType extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            list: this.props.list,
+        }
+    }
+
+    render(){
+        const list = this.state.list.map((item)=>{
+            return <option value={item}>{item}</option>
+        });
+
+        return (
+            <div className={"form-group col-md-6"} align="left">
+                <label htmlFor={this.props.id}>{this.props.name}</label>
+                <select className={"form-control"} id={this.props.id} name={this.props.id} value={this.props.value} onChange={this.props.onChange}>
+                    {list}
+                </select>
+            </div>
+        );
+    }
+}
+
+
 class OrdersForm extends React.Component {
     constructor(props) {
         super(props);
@@ -10,7 +35,8 @@ class OrdersForm extends React.Component {
             contact: '',
             GST: '',
             name: '',
-            materialType: '',
+            materialType: 'CLINKER',
+            packingType: 'Loose',
             quantity: '',
             errors: new Set(),
             messages: new Set(),
@@ -19,7 +45,7 @@ class OrdersForm extends React.Component {
 
     handleCreateOrder = (action)=> {
         action.preventDefault();
-        if(!(this.state.address && this.state.materialType && this.state.quantity && this.state.pincode && this.state.contact && this.state.name) || this.state.errors.size)
+        if(!(this.state.address && this.state.materialType && this.state.packingType && this.state.quantity && this.state.pincode && this.state.contact && this.state.name) || this.state.errors.size)
             return;
         let messages = new Set(this.state.messages);
         fetch('/order', {
@@ -73,6 +99,21 @@ class OrdersForm extends React.Component {
         });
     }
 
+    handlePackingChange = (evt)=>{
+        const message = "Please select Packing.";
+        let errors = new Set(this.state.errors);
+        if(validator.isEmpty(evt.target.value)){
+            errors.add(message);
+        }
+        else{
+            errors.delete(message);
+        }
+        this.setState({
+            packingType: evt.target.value,
+            errors: errors,
+        });
+    }
+
     handlePincodeChange = (evt)=>{
         const message = "Please Enter valid PIN Code.";
         let errors = new Set(this.state.errors);
@@ -121,8 +162,22 @@ class OrdersForm extends React.Component {
     }
 
     handleGSTChange = (evt)=>{
+        function val(str){
+            if(validator.isNumeric(''+str[0]) && validator.isNumeric(''+str[1]) && str.length===15 && validator.isNumeric(''+str[12]))
+                return true;
+            return false;
+        }
+        const message = "Not a valid GST.";
+        let errors = new Set(this.state.errors);
+        if(!val(evt.target.value) && !validator.isEmpty(evt.target.value)){
+            errors.add(message);
+        }
+        else{
+            errors.delete(message);
+        }
         this.setState({
             GST: evt.target.value,
+            errors: errors,
         })
     }
 
@@ -177,10 +232,8 @@ class OrdersForm extends React.Component {
                                 <label htmlFor="GST">GST</label>
                                 <input type={"text"} className={"form-control"} placeholder={"GST"} id={"GST"} name={"GST"} onChange={this.handleGSTChange} value={this.state.GST}/>
                             </div>
-                            <div className={"form-group col-md-6"} align="left">
-                                <label htmlFor="materialType">Material Type</label>
-                                <input type={"text"} className={"form-control"} placeholder={"Material Type"} id={"materialType"} name={"materialType"} onChange={this.handleMatrialChange} value={this.state.materialType}/>
-                            </div>
+                            <OptionType onChange={this.handleMatrialChange} name={'Material Type'} id={'materialType'} value={this.state.materialType} list={['CLINKER', 'GGBS', 'GBS_SAND', 'GBS_SLAG', 'OPC-43', 'OPC-53', 'PSC', 'PSC-CHD', 'PPC']}/>
+                            <OptionType onChange={this.handlePackingChange} name={'Packing Type'} id={'packingType'} value={this.state.packingType} list={['Loose','HPDE','2Side Lamination','1Side Lamination','Paper','Ultra Filteration','BP']}/>
                             <div className={"form-group col-md-6"} align="left">
                                 <label htmlFor="quantity">Quantity</label>
                                 <input type={"number"} className={"form-control"} placeholder={"Quantity"} id={"quantity"} name={"quantity"} onChange={this.handleQuantityChange} value={this.state.quantity}/>

@@ -59,7 +59,31 @@ class Login extends React.Component {
             errors: errors
         });
     };
-
+    reset=(action)=>{
+        action.preventDefault();
+        if(!(this.state.email) && !validator.isEmail(this.state.email))
+            return;
+        let messages = new Set(this.state.messages);
+        fetch('/reset', {
+            body: JSON.stringify(this.state),
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include',
+        }).then(response => {
+            return response.json();
+        }).then(body => {
+            if (body.error)
+                messages.add(body.error);
+            if (body.message)
+                messages.add(body.message);
+            this.setState({messages: messages});
+        }).catch(e => {
+            console.log(e.stack);
+            messages.add("Please fill details properly.");
+            messages.add(e);
+            this.setState({messages: messages});
+        });
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -97,6 +121,7 @@ class Login extends React.Component {
                             <input type={"password"} className={"form-control"} id={"password"} placeholder={"Password"} name={"password"} minLength={8} value={this.state.password} onChange={this.handlePasswordChange}/>
                         </div>
                         <button type={"submit"} className={"btn btn-primary"}>Login</button>
+                        <div align="right"><a onClick={this.reset}>Forgot Password?</a></div>
                     </form>
                 </div>
             </div>

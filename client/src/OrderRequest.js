@@ -3,6 +3,32 @@ import Dropzone from 'react-dropzone';
 import DataFrame from 'dataframe-js';
 import validator from "validator";
 
+class OptionType extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            list: this.props.list,
+        }
+    }
+
+    render(){
+        const list = this.state.list.map((item)=>{
+            return <option value={item}>{item}</option>
+        });
+
+        return (
+            <div className={"form-group"} align="left">
+                <label htmlFor={this.props.id}>{this.props.name}</label>
+                <select className={"form-control"} id={this.props.id} name={this.props.id} value={this.props.value} onChange={this.props.onChange}>
+                    {list}
+                </select>
+            </div>
+        );
+    }
+}
+
+
+
 class OrderRequest extends React.Component {
     updateOrder = (id, index)=> {
         return (action) => {
@@ -189,13 +215,11 @@ class OrderRequest extends React.Component {
                         <label>PIN Code: {data.pincode}</label><br />
                         {(data.GST)?<label>GST: {data.GST}</label>:''}{(data.GST)?<br/>:''}
                         <label>Material Type: {data.materialType}</label><br />
+                        <label>Packing Type: {data.packingType}</label><br />
                         <label>Quantity: {data.quantity}</label><br />
                         <hr/>
                         <form onSubmit={(action) => that.handleSubmit(action, data._id)}>
-                            <div className={"form-group"} align="left">
-                                <label>Status</label>
-                                <input type={"text"} className={"form-control"} value={data.status} placeholder={"Status"} name={"status"} onChange={that.handleStatusChange(index)} />
-                            </div>
+                            <OptionType onChange={that.handleStatusChange(index)} name={'Status'} id={'status'} value={data.status} list={['NotVerified', 'Under Process','Delivery Instruction Issued','Under Loading', 'In transit', 'Delivered']}/>
                             <div className={"form-group"} align="left">
                                 <label>Location</label>
                                 <input type={"text"} className={"form-control"} value={data.location} placeholder={"Location"} name={"location"} onChange={that.handleLocationChange(index)} />

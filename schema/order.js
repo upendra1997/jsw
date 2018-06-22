@@ -16,7 +16,15 @@ const orderSchema = new Schema({
     },
     materialType: {
         type: String,
+        enum: ['CLINKER','GGBS','GBS_SAND','GBS_SLAG','OPC-43','OPC-53','PSC','PSC-CHD','PPC'],
         required: true,
+        default: 'PSC'
+    },
+    packingType:{
+        type: 'String',
+        enum: ['Loose','HPDE','2Side Lamination','1Side Lamination','Paper','Ultra Filteration','BP'],
+        required: true,
+        default: 'HDPE'
     },
     pincode:{
         type: Number,
@@ -38,11 +46,12 @@ const orderSchema = new Schema({
     },
     GST:{
         type: String,
+        //TODO: GST : dd10wdww
     },
     status: {
         type: String,
         default: 'NotVerified',
-        enum: ['NotVerified', 'Packaging', 'On Route', 'Delivered'], //TODO: add more statuses
+        enum: ['NotVerified', 'Under Process','Delivery Instruction Issued','Under Loading', 'In transit', 'Delivered'],
         required: true,
     },
     quantity: {

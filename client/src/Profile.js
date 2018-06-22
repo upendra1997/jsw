@@ -93,6 +93,7 @@ class Profile extends React.Component {
             return;
         let errors = new Set(this.state.errors);
         let messages = new Set(this.state.messages);
+        errors.delete(message);
         fetch('/check', {
             body: JSON.stringify({
                 email: this.state.email,
@@ -112,9 +113,11 @@ class Profile extends React.Component {
                     credentials: 'include',
                 }).then((data) => {
                     messages.add("Password Changed");
+                    this.setState({messages: messages})
                 })
             } else {
                 errors.add(message);
+                this.setState({errors: errors})
             }
         })
     };

@@ -121,6 +121,7 @@ class Order extends React.Component {
                     <label>PIN Code: {data.pincode}</label><br/>
                     {(data.GST) ? <label>GST: {data.GST}</label> : ''}{(data.GST) ? <br/> : ''}
                     <label>Material Type: {data.materialType}</label><br/>
+                    <label>Packing Type: {data.packingType}</label><br/>
                     <label>Quantity: {data.quantity}</label><br/>
                     <input type={"button"} className={"btn btn-danger"} onClick={this.deleteOrder(data._id)}
                            value={"Cancel"}/>

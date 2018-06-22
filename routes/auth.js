@@ -1,9 +1,10 @@
+const {env} = require("../config");
 const express = require('express');
 const {User} = require('../schema/models');
 const {_} = require('lodash');
 const {authenticate} = require('../middleware/authenticate');
 const router = express.Router();
-
+const nodemailer = require('nodemailer');
 
 router.post('/signup', function (req, res) {
     const data = _.pick(req.body, ['name', 'email', 'contact', 'password', 'address', 'owner', 'kind']);
@@ -12,10 +13,33 @@ router.post('/signup', function (req, res) {
         console.log("User Created");
         user.generateToken('verify').then((t) => {
             console.log("verification token generated " + t);
+            /*Send mail*/
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: env['username'],
+                    pass: env['password']
+                }
+            });
+
+            const mailOptions = {
+                from: env['username'],
+                to: data['email'],
+                subject: 'JSW Dealer and Sub-Delaer account verification',
+                text: 'please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t,
+            };
+            console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t)
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+            /*mail end*/
         }).catch((e) => {
             console.log("verification token generation failed " + e);
         });
-        //TODO: SEND MAIL and generate token with access verify.
         res.send({message: 'User Created'});
     }).catch((e) => {
         res.status(409).send({error: e.message});
@@ -26,10 +50,10 @@ router.post('/signup', function (req, res) {
 router.post('/login', function (req, res) {
     const data = _.pick(req.body, ['email', 'password']);
     User.findByCredentials(data.email, data.password).then(function (user) {
-        if (user.status === "NotVerified") { //TODO: change to verified.
+        if (user.status === "Verified") {
             user.generateToken().then((token) => {
                 res.setHeader('Set-Cookie', ['x-auth=' + token]);
-                user = _.pick(user, ['_id', 'address', 'contact', 'email', 'kind', 'members', 'name', 'status']);
+                user = _.pick(user, ['_id', 'address', 'contact', 'email', 'kind', 'owner', 'members', 'name', 'status']);
                 console.log(user);
                 res.header('x-auth', token).send({user, message: "User Logged in."});
             }).catch((e) => {
@@ -50,7 +74,7 @@ router.post('/check', authenticate, function (req, res) {
     const data = _.pick(req.body, ['email', 'password']);
     console.log(data);
     User.findByCredentials(data.email, data.password).then(function (user) {
-        if (user.status === "NotVerified") { //TODO: change to verified
+        if (user.status === "Verified") {
             res.status(200).send({message: 'user exists'});
         }
         else {
@@ -75,7 +99,7 @@ router.post('/changepassword', authenticate, function (req, res) {
 router.get('/info/:id', function (req, res) {
     const id = req.params["id"];
     User.findById(id).then((user) => {
-        const a = _.pick(user, ['name', 'email', 'contact', 'address', 'kind', 'members']);
+        const a = _.pick(user, ['name', 'email', 'contact', 'address', 'kind', 'members', 'owner']);
         console.log(user.name + " " + id + " " + user.members);
         res.status(200).send(a);
     }).catch((e) => {
@@ -99,7 +123,38 @@ router.post('/reset', (req, res) => {
     User.findByCredentials(data.email, "", "reset").then((user) => {
         console.log("User found", user);
         user.generateToken('reset').then((token) => {
-            //TODO: send email with the token
+            /*Send mail*/
+            function randomPass() {
+                let text = "";
+                const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                for (let i = 0; i < 8; i++)
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+                return text;
+            }
+            const pass = randomPass();
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: env['username'],
+                    pass: env['password']
+                }
+            });
+
+            const mailOptions = {
+                from: env['username'],
+                to: data['email'],
+                subject: 'JSW Dealer and Sub-Delaer account verification',
+                text: 'please go to http://'+env['HOST']+':'+env['PORT']+'/reset/'+token+'/'+pass+' for new password '+pass+'',
+            };
+            console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/reset/'+token+'/'+pass)
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+            /*mail end*/
             console.log(token);
             console.log({message: "Mail sent with token"});
             res.send({message: "Mail sent with token"});
@@ -110,8 +165,8 @@ router.post('/reset', (req, res) => {
     });
 });
 
-router.post('/reset/:id', (req, res) => {
-    const data = _.pick(req.body, ['password']);
+router.get('/reset/:id/:password', (req, res) => {
+    const pass = req.params['password']
     const token = req.params['id'];
     User.findByToken(token, 'reset').then((user) => {
         if (!user) {
@@ -119,7 +174,7 @@ router.post('/reset/:id', (req, res) => {
         }
         console.log({message: "User found"});
         User.findOne(user).then((doc) => {
-            doc.password = data.password;
+            doc.password = pass;
             doc.save().then(() => {
                 console.log("Password Updated");
                 user.removeToken(token).then(() => {

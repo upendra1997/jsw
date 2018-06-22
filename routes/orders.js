@@ -28,7 +28,7 @@ router.get('/request/verify', authenticate, function (req, res) {
     }).then(doc => {
         res.send(doc);
     }).catch((e) => {
-        res.send({error: e});
+        res.send({error: e.message});
     })
 });
 
@@ -44,14 +44,14 @@ router.get('/', authenticate, function (req, res) {
         console.log(data);
         res.send(data);
     }).catch((e) => {
-        res.status(505).send(e);
+        res.status(505).send({error: e.message});
     });
 });
 
 // Create Order
 router.post('/', authenticate, function (req, res, next) {
     const id = req.user._id;
-    let data = _.pick(req.body, ['address', 'materialType', 'quantity','contact','pincode','GST','name']);
+    let data = _.pick(req.body, ['address', 'materialType','packingType', 'quantity','contact','pincode','GST','name']);
     User.findById(id).then((user) => {
         if (!data.address)
             data.address = user.address;
@@ -71,8 +71,8 @@ router.post('/', authenticate, function (req, res, next) {
             console.log("Order not saved " + e);
         });
     }).catch((e) => {
-        res.status(500).send({"error": e});
-        console.log("user Not found " + e);
+        res.status(500).send({"error": e.message});
+        console.log("user Not found " + e.message);
     });
 }, logHistory);
 
@@ -100,7 +100,7 @@ router.put('/:id', authenticate, function (req, res, next) {
         req.HISTORY = data;
         next();
     }).catch((e) => {
-        res.status(500).send(e);
+        res.status(500).send({error: e.message});
     });
 }, logHistory);
 
@@ -117,13 +117,13 @@ router.delete('/:id', authenticate, function (req, res, next) {
         },
         _id: orderId,
     }).remove((doc) => {
-        res.send(JSON.stringify(doc));
+        res.send({message: 'Order ' + orderId + ' deleted'});
         data.message = "Order Deleted";
         data._id = orderId;
         req.HISTORY = data;
         next();
     }).catch((e) => {
-        res.status(505).send(e);
+        res.status(505).send({error: e.message});
     });
 }, logHistory);
 
@@ -140,22 +140,27 @@ router.get('/track', authenticate, function (req, res) {
         console.log(data);
         res.send(data);
     }).catch((e) => {
-        res.status(505).send(e);
+        res.status(505).send({error: e.message});
     });
 });
 
 router.get('/download', authenticate, function (req, res) {
+    const members = req.user.members || [];
     Order.find({
-        userId: req.user._id,
-        status: "NotVerified",
+        userId: {
+            $in: members,
+        },
+        status: {
+            $ne: 'Delivered',
+        }
     }).sort({
         '_id': -1
     }).then((data) => {
         console.log(data);
-        const df = new DataFrame(data, ['_id', 'name', 'address', 'pincode', 'contact', 'GST', 'materialType', 'quantity', 'status', 'location', 'driver.name', 'driver.contact']);
+        const df = new DataFrame(data, ['_id', 'name', 'address', 'pincode', 'contact', 'GST', 'materialType','packingType', 'quantity', 'status', 'location', 'driver.name', 'driver.contact']);
         df.toCSV(true, __dirname + '/a.csv');
         res.download(__dirname + '/a.csv', 'Download');
-    }).catch((e) => res.send({error: e}));
+    }).catch((e) => res.send({error: e.message}));
 });
 
 

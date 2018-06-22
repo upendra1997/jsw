@@ -1,7 +1,9 @@
 {
   "secret":"abc123",
-  "host":"localhost",
+  "HOST":"localhost",
   "PORT": "5000",
   "MONGODB_URI":"mongodb://localhost/Test",
-  "database_port":"27017"
+  "database_port":"27017",
+  "username": "upendra.upadhyay.97@gmail.com",
+  "password": "xxxxxxxxxxxxxxx"
 }

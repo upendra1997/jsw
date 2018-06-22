@@ -76,8 +76,8 @@ class Track extends React.Component {
                         {(data.address) ? <label>Address: {data.address}</label> : ''}{(data.address) ? <br/> : ''}
                         {(data.pincode) ? <label>PIN Code: {data.pincode}</label> : ''}{(data.pincode) ? <br/> : ''}
                         {(data.GST) ? <label>GST: {data.GST}</label> : ''}{(data.GST) ? <br/> : ''}
-                        {(data.materialType) ?
-                            <label>Material Type: {data.materialType}</label> : ''}{(data.materialType) ? <br/> : ''}
+                        {(data.materialType) ? <label>Material Type: {data.materialType}</label> : ''}{(data.materialType) ? <br/> : ''}
+                        {(data.packingType) ? <label>Packing Type: {data.packingType}</label> : ''}{(data.packingType) ? <br/> : ''}
                         {(data.quantity) ? <label>Quantity: {data.quantity}</label> : ''}{(data.quantity) ? <br/> : ''}
                         {(data.status) ? <label>Status: {data.status}</label> : ''}{(data.status) ? <br/> : ''}
                     </div>

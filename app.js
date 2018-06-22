@@ -6,7 +6,8 @@ const logger = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
-
+const admin = require('./admin')
+const {mongoose,User} = require('./schema/models')
 const authRouter = require('./routes/auth');
 const orderRouter = require('./routes/orders');
 const userRouter = require('./routes/users');
@@ -33,6 +34,37 @@ app.use('/user', userRouter);
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
+
+const day = 1000 * 60 * 60 * 24;
+/*create ADMIN*/
+const user = new User();
+user.email = admin['email'];
+user.password = admin['password'];
+user.name = "Admin";
+user.kind = "admin";
+user.contact = admin['contact'];
+user.status = 'Verified';
+user.address = admin["address"];
+user.save().then((a)=>{
+    a.owner = a._id;
+    a.save();
+}).catch((e)=>{
+    console.log('admin message: '+e.message);
+});
+/*End Admin*/
+/*Clean unverified user*/
+setInterval(function(){
+    console.log('clean');
+    User.find({}).then((users)=>{
+       for(const a of users){
+           if( new Date() - a._id.getTimestamp()>= day && a.status=="NotVerified") {
+               User.findByIdAndRemove(a);
+               console.log('deleted '+a);
+           }
+       }
+    });
+},day);
+/*Clean unverified user end*/
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
