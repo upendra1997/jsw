@@ -166,16 +166,14 @@ class OrderRequest extends React.Component {
             const data = df.toCollection();
             const list = this.state.list;
             for (const item of data) {
-                let i = list.findIndex(a => a._id === data._id);
+                let i = list.findIndex(a => a._id === item._id);
                 if (i == -1) continue;
-                list[i].status = data[i].status;
-                list[i].location = data[i].location;
+                list[i].status = item.status;
+                list[i].location = item.location;
                 list[i].driver = {name: '', contact: ''};
-                list[i].driver.name = data[i]["driver.name"];
-                list[i].driver.contact = data[i]["driver.contact"];
+                list[i].driver.name = item["driver.name"];
+                list[i].driver.contact = item["driver.contact"];
             }
-            console.log(list);
-            console.log(data);
             this.setState({list: list});
         });
     }
