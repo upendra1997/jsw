@@ -5,7 +5,6 @@ const {_} = require('lodash');
 const {authenticate} = require('../middleware/authenticate');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-const Mailgun = require('mailgun-js');
 
 router.post('/signup', function (req, res) {
     const data = _.pick(req.body, ['name', 'email', 'contact', 'password', 'address', 'owner', 'kind']);
