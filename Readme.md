@@ -55,6 +55,9 @@ In the trade segment of cement distribution the cement is sold through several d
 2. Go to project folder and run `heroku create` and enter login id.
 3. run `heroku addons:create mongolab`.
 4. run `git push heroku master`.
+5. to allow sending of email from gmail, please go to 
+    1. [Here](https://www.google.com/settings/security/lesssecureapps) and enable less secure apps.
+    2. [Here](https://accounts.google.com/b/0/displayunlockcaptcha) Disable Captcha temporarily so you can connect the new device/server. If email service stop working then go to this link and try again after enabling them.
 
 ## Documentation
 
@@ -111,6 +114,63 @@ In the trade segment of cement distribution the cement is sold through several d
         `-- user.js                 --User Schema
 
 ```
+### Database Architecture
+#### User Database
+##### Schema
+| Field Name | Type   |Unique | Required | MaxLength | MinLength | trim | validator              | enum                      | default | Comment |
+|------------| -------|------ | -------- | --------- | --------- | ---- | ----------------       | --------------------------| ------- | --------|
+|Name        | String |False  | True     | 70        | 1         | True |        -               | -                         |     -   | - |
+|Email       | String |True   | True     |255        | 5         |True  | Email Validator        | -                         | -       | It uses Validator.js for finding correct Emails. |
+|Contact     | String |True   | True     | -         | -         | -    | en-IN mobile validator | -                         |   -     | It uses Validator.js for finding Indian Mobile Phones. |
+|Status      | String |False  | True     | -         | -         | -    |         -              |['NotVerified', 'Verified']|   -     | if email is verified or not. |
+|Password    | String |False  | True     | -         | 8         |True  |          -             | -                         |   -     | Hashed password |
+|Address     | String |False  | True     | 512       | 1         |True  |           -            | -                         |   -     | - |
+|History     |[Object]| -     | -        | -         | -         | -    | -                      |  -                        |    -    | Object which have date and comment Message attached to it. |
+|Members     |[String]|-      | -        | -         | -         | -    | -                      | -                         |     -   | It contain ID of subdealers managed by Dealer |
+|Owner       |String  | -     | -        | -         | -         |-     | -                      |  -                        |    -    | It contain the ID of admin who manages the dealer |
+|Kind        | String | -     | True     | -         | -         | -    | -                      |["admin", "dealer", "sub-dealer"]    |  admin| - | 
+|tokens      |Object  | -     | -        | -         | -         | -    | -                      | -                          | -      | Contains auth token for login, resetting password and verifying email. |
+##### Methods 
+These database also have methods for easing the use off schema
+###### 1. generateToken(access="auth")
+It generate various tokens with access = {auth, verify, reset password} and store it in the user's token field.
+###### 2. generateToken(token)
+It finds the said token from the user table/Collection and remove the token.
+###### 3. findByToken(token, access = "auth") -> User
+It find the user with following access and token from User table/Collection.
+###### 4. findByCredentials(email, password, access = "auth") -> User
+It finds and return the user which matches the email or both email and password with given access.
+###### 5. Before Saving
+before saving each document or user it hashes the password for security.
+
+#### Order Database
+##### Schema
+| Field Name | Type   | Required | trim |Length | validator              | enum                      | default | Comment |
+|------------| -------| -------- | ---- | ------|----------       | --------------------------| ------- | --------|
+|UserId      | String | True     | -    |       |-               | -                         |     -   | id of the user, which created  order |
+|Address     | String | True     |True  |       |    -            | -                         |   -     | Shipping Address |
+|Material Type| String| True     |-     |       |     -           |['CLINKER', 'GGBS', 'GBS_SAND', 'GBS_SLAG', 'OPC-43', 'OPC-53', 'PSC', 'PSC-CHD', 'PPC']| PSC | - |
+|Packing Type| String| True     |-     |       |     -           |['Loose', 'HPDE', '2Side Lamination', '1Side Lamination', 'Paper', 'Ultra Filtration', 'BP']| HDPE | - |
+|Pincode     | Number | True | - | 6 | - | - | - | - |
+|Name        | String |True| True  | 70  |        -               | -                         |     -   |Name of the Reciever.|
+|Contact     | String | True     | -    |       |en-IN mobile validator | -                         |   -     | Contact number of the person receiving the order. |
+|GST         | String | False    | True | 15    | Custom GST validator |        -               |   -   |   -   |
+|Status      | String | True     | -    |   -   |  -              |['NotVerified', 'Under Process', 'Delivery Instruction Issued', 'Under Loading', 'In transit', 'Delivered']|NotVerified | Status of order. |
+|Quantity    |Number  | True     | -    | -     | -               | -       |     -  | Quantity of product. |
+|Location      String |          | True | -     |  -              |  -  | -  | Current Location of order if available |
+|Driver     | {Name, Conatct} | - | - | - | en-IN mobile validator | - | - | Name and contact of driver. |
+
+### Middleware
+#### Authenticate
+This Middleware will check if the user is logged in or not by checking its cookies and their content. If user is logged in then it will attach the data of logged in user to request and will pass it the next function. If user is not logged in then it will reject the request and send error response with status `401`.
+```
+{
+    error: "Can't find user with token"
+}
+```
+#### Log History
+it take the message attached with request with date and add it to history array of the user logged in.
+
 ### API Architecture
 #### Auth API `/`
 ##### Signup `POST /signup`
@@ -571,5 +631,3 @@ It make the user with id a member of logged in user and sends empty object
     
 }
 ```
-### Database Architecture
-#### User Database

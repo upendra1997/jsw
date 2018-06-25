@@ -43,6 +43,8 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true,
+        minlength: 8,
+        trim: true,
     },
     address: {
         type: String,
@@ -98,7 +100,7 @@ userSchema.methods.removeToken = function (token) {
     });
 };
 
-userSchema.statics.findByToken = function (token, mode = "auth") {
+userSchema.statics.findByToken = function (token, access = "auth") {
     const user = this;
     let decoded = null;
     try {
@@ -109,17 +111,17 @@ userSchema.statics.findByToken = function (token, mode = "auth") {
     return user.findOne({
         _id: decoded._id,
         'tokens.token': token,
-        'tokens.access': mode,
+        'tokens.access': access,
     });
 };
 
-userSchema.statics.findByCredentials = function (email, password, mode = "auth") {
+userSchema.statics.findByCredentials = function (email, password, access = "auth") {
     const User = this;
     return User.findOne({email}).then((user) => {
         if (!user) {
             return Promise.reject();
         }
-        if (mode !== "auth") {
+        if (access !== "auth") {
             return Promise.resolve(user);
         }
         return new Promise((resolve, reject) => {

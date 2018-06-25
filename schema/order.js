@@ -35,6 +35,9 @@ const orderSchema = new Schema({
     name: {
         type: String,
         required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 70,
     },
     contact: {
         type: String,
@@ -46,7 +49,7 @@ const orderSchema = new Schema({
     },
     GST:{
         type: String,
-        //TODO: GST : dd10wdww
+        trim: true,
     },
     status: {
         type: String,
@@ -55,11 +58,12 @@ const orderSchema = new Schema({
         required: true,
     },
     quantity: {
-        type: String,
+        type: Number,
         required: true,
     },
     location: {
         type: String,
+        trim: true,
     },
     driver: {
         name: {

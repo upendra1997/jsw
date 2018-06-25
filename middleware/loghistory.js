@@ -8,7 +8,7 @@ const logHistory = (req, res) => {
     }).then(() => {
         console.log("Logged");
     }).catch((e) => {
-        console.log(e);
+        console.log(e.message);
     });
 };
 
