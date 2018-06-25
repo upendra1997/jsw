@@ -11,7 +11,7 @@ In the trade segment of cement distribution the cement is sold through several d
     ```
     {
       "secret":"abc123",
-      "host":"localhost",
+      "HOST":"localhost",
       "PORT": "5000",
       "MONGODB_URI":"mongodb://localhost/Test",
       "database_port":"27017",
@@ -55,9 +55,10 @@ In the trade segment of cement distribution the cement is sold through several d
 2. Go to project folder and run `heroku create` and enter login id.
 3. run `heroku addons:create mongolab`.
 4. run `git push heroku master`.
-5. to allow sending of email from gmail, please go to 
+5. To allow sending of email from gmail, please go to 
     1. [Here](https://www.google.com/settings/security/lesssecureapps) and enable less secure apps.
     2. [Here](https://accounts.google.com/b/0/displayunlockcaptcha) Disable Captcha temporarily so you can connect the new device/server. If email service stop working then go to this link and try again after enabling them.
+6. add all the keys with proper values from congig.json to heroku secrets.
 
 ## Documentation
 
