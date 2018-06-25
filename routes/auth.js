@@ -5,6 +5,7 @@ const {_} = require('lodash');
 const {authenticate} = require('../middleware/authenticate');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const Mailgun = require('mailgun-js');
 
 router.post('/signup', function (req, res) {
     const data = _.pick(req.body, ['name', 'email', 'contact', 'password', 'address', 'owner', 'kind']);
@@ -13,9 +14,24 @@ router.post('/signup', function (req, res) {
         console.log("User Created");
         user.generateToken('verify').then((t) => {
             console.log("verification token generated " + t);
-            /*Send mail*/
+             /*Send mail*/
+
+            // const mg = new Mailgun({apiKey: env['mailgun-api-key'], domain: env['mailgun-domain']});
+            // const msg = {
+            //     "from": env["username"],
+            //     "to": data['email'],
+            //     "subject": 'JSW Dealer and Sub-Delaer account verification',
+            //     "html": 'please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t,
+            // };
+            //
+            // mg.messages().send(msg, function(err,body){
+            //    if(err) console.log(err);
+            //    else console.log(body);
+            // });
+
+
             const transporter = nodemailer.createTransport({
-                service: 'Gmail',
+                service: 'gmail',
                 auth: {
                     user: env['username'],
                     pass: env['password']
