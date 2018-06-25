@@ -14,7 +14,7 @@ router.post('/signup', function (req, res) {
         user.generateToken('verify').then((t) => {
             console.log("verification token generated " + t);
             /*Send mail*/
-            const transporter = nodemailer.createTransport({
+            const transporter = nodemailer.createTransport("SMTP",{
                 service: 'gmail',
                 auth: {
                     user: env['username'],
@@ -132,7 +132,7 @@ router.post('/reset', (req, res) => {
                 return text;
             }
             const pass = randomPass();
-            const transporter = nodemailer.createTransport({
+            const transporter = nodemailer.createTransport("SMTP",{
                 service: 'gmail',
                 auth: {
                     user: env['username'],
