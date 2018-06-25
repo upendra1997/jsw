@@ -37,12 +37,12 @@ router.post('/signup', function (req, res) {
                     pass: env['password']
                 }
             });
-
+            const port = (process.env['NODE_ENV']==='production')?'':':'+env['PORT'];
             const mailOptions = {
                 from: env['username'],
                 to: data['email'],
                 subject: 'JSW Dealer and Sub-Delaer account verification',
-                text: 'please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t,
+                text: 'please go to http://'+port+env['PORT']+'/verify/'+t,
             };
             console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t)
             transporter.sendMail(mailOptions, function(error, info){
@@ -155,12 +155,12 @@ router.post('/reset', (req, res) => {
                     pass: env['password']
                 }
             });
-
+            const port = (process.env['NODE_ENV']==='production')?'':':'+env['PORT'];
             const mailOptions = {
                 from: env['username'],
                 to: data['email'],
                 subject: 'JSW Dealer and Sub-Delaer account verification',
-                text: 'please go to http://'+env['HOST']+':'+env['PORT']+'/reset/'+token+'/'+pass+' for new password '+pass+'',
+                text: 'please go to http://'+env['HOST']+port+'/reset/'+token+'/'+pass+' for new password '+pass+'',
             };
             console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/reset/'+token+'/'+pass)
             transporter.sendMail(mailOptions, function(error, info){
