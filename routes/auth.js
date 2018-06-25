@@ -41,7 +41,7 @@ router.post('/signup', function (req, res) {
                 from: env['username'],
                 to: data['email'],
                 subject: 'JSW Dealer and Sub-Delaer account verification',
-                text: 'please go to http://'+port+env['PORT']+'/verify/'+t,
+                text: 'please go to http://'+env['HOST']+port+'/verify/'+t,
             };
             console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t)
             transporter.sendMail(mailOptions, function(error, info){
