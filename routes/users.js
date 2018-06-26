@@ -8,14 +8,11 @@ const router = express.Router();
 
 router.get('/', authenticate, function (req, res) {
     let user = _.pick(req.user, ['status', 'owner', 'members', 'kind', '_id', 'name', 'email', 'contact', 'address']);
-    console.log(user);
     res.send(user);
 });
 
 
 router.get('/request',authenticate, function(req, res){
-    // let members = req.user.members || [];
-    // console.log(members);
     const kind = {
         'admin': ['admin', 'dealer'],
         'dealer': ['sub-dealer'],
@@ -33,7 +30,6 @@ router.get('/request',authenticate, function(req, res){
         },
         status: 'Verified',
     }).then(users => {
-        console.log(users);
         res.send(users);
     });
 
@@ -45,11 +41,9 @@ router.get('/request/accept/:id', authenticate, function (req, res) {
     User.findById(id).then(USER => {
         USER.owner = String(user.id);
         USER.save();
-        console.log(USER);
     });
     user.members.push(String(id));
     user.save();
-    console.log(user);
     res.send({});
 });
 

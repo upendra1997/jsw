@@ -57,17 +57,17 @@ class OrdersForm extends React.Component {
             return response.json();
         }).then(body => {
             if (body.error)
-                messages.add(body.error)
+                messages.add(body.error);
             if (body.message)
                 messages.add(body.message);
-            console.log(messages);
+
             this.setState({messages: messages});
         }).catch(e => {
             messages.add("Please fill details properly.");
             messages.add(e);
             this.setState({messages: messages});
         });
-    }
+    };
 
     handleAddressChange = (evt)=>{
         const message = "Please fill Address.";
@@ -82,7 +82,7 @@ class OrdersForm extends React.Component {
             address: evt.target.value,
             errors: errors,
         });
-    }
+    };
 
     handleMatrialChange = (evt)=>{
         const message = "Please select material.";
@@ -97,7 +97,7 @@ class OrdersForm extends React.Component {
             materialType: evt.target.value,
             errors: errors,
         });
-    }
+    };
 
     handlePackingChange = (evt)=>{
         const message = "Please select Packing.";
@@ -112,12 +112,12 @@ class OrdersForm extends React.Component {
             packingType: evt.target.value,
             errors: errors,
         });
-    }
+    };
 
     handlePincodeChange = (evt)=>{
         const message = "Please Enter valid PIN Code.";
         let errors = new Set(this.state.errors);
-        if(evt.target.value.length != 6){
+        if(evt.target.value.length !== 6){
             errors.add(message);
         }
         else{
@@ -129,7 +129,7 @@ class OrdersForm extends React.Component {
                 errors: errors,
             });
         }
-    }
+    };
 
     handleNameChange = (evt)=>{
         const message = "Please Enter Name.";
@@ -144,7 +144,7 @@ class OrdersForm extends React.Component {
             name: evt.target.value,
             errors: errors,
         });
-    }
+    };
 
     handleContactChange = (evt)=>{
         const message = "Not a valid contact number.";
@@ -159,7 +159,7 @@ class OrdersForm extends React.Component {
             contact: evt.target.value,
             errors: errors,
         });
-    }
+    };
 
     handleGSTChange = (evt)=>{
         function val(str){
@@ -179,7 +179,7 @@ class OrdersForm extends React.Component {
             GST: evt.target.value,
             errors: errors,
         })
-    }
+    };
 
     handleQuantityChange = (evt)=>{
         const message = "Please give quantity.";
@@ -194,7 +194,7 @@ class OrdersForm extends React.Component {
             quantity: evt.target.value,
             errors: errors,
         });
-    }
+    };
 
     render() {
         const errors = [];

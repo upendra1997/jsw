@@ -48,7 +48,6 @@ class OrderRequest extends React.Component {
                     messages.add(body.error);
                 if (body.message)
                     messages.add(body.message);
-                console.log(messages);
                 this.setState({messages: messages});
             }).catch(e => {
                 messages.add("Please fill details properly.");
@@ -121,7 +120,6 @@ class OrderRequest extends React.Component {
     batchUpdate = (evt) => {
         evt.preventDefault();
         for (let i = 0; i < this.state.list.length; i++) {
-            console.log(this.state.list[i]);
             this.updateOrder(this.state.list[i]._id, i)({
                 preventDefault: function () {
                 }
@@ -167,7 +165,7 @@ class OrderRequest extends React.Component {
             const list = this.state.list;
             for (const item of data) {
                 let i = list.findIndex(a => a._id === item._id);
-                if (i == -1) continue;
+                if (i === -1) continue;
                 list[i].status = item.status;
                 list[i].location = item.location;
                 list[i].driver = {name: '', contact: ''};

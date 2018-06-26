@@ -43,7 +43,7 @@ router.post('/signup', function (req, res) {
                 subject: 'JSW Dealer and Sub-Delaer account verification',
                 text: 'please go to http://'+env['HOST']+port+'/verify/'+t,
             };
-            console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t)
+            console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/verify/'+t);
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                     console.log(error);
@@ -161,7 +161,7 @@ router.post('/reset', (req, res) => {
                 subject: 'JSW Dealer and Sub-Delaer account verification',
                 text: 'please go to http://'+env['HOST']+port+'/reset/'+token+'/'+pass+' for new password '+pass+'',
             };
-            console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/reset/'+token+'/'+pass)
+            console.log('please go to http://'+env['HOST']+':'+env['PORT']+'/reset/'+token+'/'+pass);
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
                     console.log(error);
@@ -181,7 +181,7 @@ router.post('/reset', (req, res) => {
 });
 
 router.get('/reset/:id/:password', (req, res) => {
-    const pass = req.params['password']
+    const pass = req.params['password'];
     const token = req.params['id'];
     User.findByToken(token, 'reset').then((user) => {
         if (!user) {

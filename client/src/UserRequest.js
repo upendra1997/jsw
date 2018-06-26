@@ -35,7 +35,6 @@ class UserRequest extends React.Component {
 
     acceptRequest = (id, index) => {
         return (action) => {
-            console.log(id);
             action.preventDefault();
             fetch('/user/request/accept/' + id, {
                 method: 'get',
@@ -44,7 +43,6 @@ class UserRequest extends React.Component {
             }).then(response => {
                 return response.json();
             }).then(body => {
-                console.log(body);
                 const list = this.state.list;
                 delete list[index];
                 this.setState({list: list});
@@ -68,25 +66,6 @@ class UserRequest extends React.Component {
             messages.push((<li key={error}>{error}</li>));
         });
         const that = this;
-        // const list  = this.state.list.map(function (data, index) {
-        //
-        //     return (<li id={data._id} key={data._id}>
-        //         <div>
-        //             <label>Order ID:</label> {data._id}<br />
-        //             <label>Address:</label> {data.address}<br />
-        //             <label>Material Type:</label> {data.materialType}<br />
-        //             <label>Quantity:</label> {data.quantity}<br />
-        //             <form onSubmit={(action) => that.handleSubmit(action, data._id)}>
-        //                 <input type={"text"} value={data.status} placeholder={"Status"} name={"status"} onChange={that.handleStatusChange(index)} />
-        //                 <input type={"text"} value={data.location} placeholder={"Location"} name={"location"} onChange={that.handleLocationChange(index)} />
-        //                 <input type={"text"} value={data.driver.name} placeholder={"Driver Name"} name={"driver.name"} onChange={that.handleDriverNameChange(index)} />
-        //                 <input type={"text"} value={data.driver.contact} placeholder={"Driver Contact"} name={"driver.contact"} onChange={that.handleDriverContactChange(index)} />
-        //                 <input type={"button"} onClick={that.acceptRequest(data._id, index)} value={"Update"}/>
-        //             </form>
-        //         </div>
-        //     </li>);
-        // });
-
         const list  = this.state.list.map(function (data, index) {
             if (!data.driver) {
                 data.driver = {

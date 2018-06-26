@@ -17,7 +17,6 @@ router.get('/history', authenticate, function (req, res) {
 
 router.get('/request/verify', authenticate, function (req, res) {
     const members = req.user.members || [];
-    console.log(members);
     Order.find({
         userId: {
             $in: members,
@@ -41,7 +40,6 @@ router.get('/', authenticate, function (req, res) {
     }).sort({
         '_id': -1
     }).then((data) => {
-        console.log(data);
         res.send(data);
     }).catch((e) => {
         res.status(505).send({error: e.message});
@@ -55,12 +53,10 @@ router.post('/', authenticate, function (req, res, next) {
     User.findById(id).then((user) => {
         if (!data.address)
             data.address = user.address;
-        console.log(data.address);
     }).then(() => {
         data.userId = id;
         const order = new Order(data);
         order.save().then((doc) => {
-            console.log("Order Saved");
             data.message = "Object Created";
             data._id = order._id;
             req.HISTORY = data;
@@ -82,7 +78,6 @@ router.put('/:id', authenticate, function (req, res, next) {
     const userId = req.user._id;
     const orderId = req.params["id"];
     const data = _.pick(req.body, ['location', 'status', 'driver']);
-    console.log(data);
     let members = req.user.members || [];
     Order.find({
         userId: {
@@ -137,7 +132,6 @@ router.get('/track', authenticate, function (req, res) {
     }).sort({
         '_id': -1
     }).then((data) => {
-        console.log(data);
         res.send(data);
     }).catch((e) => {
         res.status(505).send({error: e.message});
@@ -156,7 +150,6 @@ router.get('/download', authenticate, function (req, res) {
     }).sort({
         '_id': -1
     }).then((data) => {
-        console.log(data);
         const df = new DataFrame(data, ['_id', 'name', 'address', 'pincode', 'contact', 'GST', 'materialType','packingType', 'quantity', 'status', 'location', 'driver.name', 'driver.contact']);
         df.toCSV(true, __dirname + '/a.csv');
         res.download(__dirname + '/a.csv', 'Download');

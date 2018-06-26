@@ -142,10 +142,8 @@ userSchema.pre('save', function (next) {
     // This middleware will run every time save() is called, we don't want to hash our password again and again. that's why isModified.
     if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
-            console.log("password " + user.password);
             bcrypt.hash(user.password, salt, (err, hash) => {
                 user.password = hash;
-                console.log(hash);
                 next();
             });
         });

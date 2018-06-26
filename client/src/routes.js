@@ -17,7 +17,7 @@ const Routes = (props) => {
             <Route exact path='/' render={(prop) => {
                 return <Welcome {...prop} user={props.user}/>
             }}/>
-            {props.user.kind == undefined ? (
+            {props.user.kind === undefined ? (
                 <Route exact path='/login' render={(prop) => {
                     return <Login {...prop} setUser={props.setUser}/>
                 }}/>
@@ -27,22 +27,22 @@ const Routes = (props) => {
                     return <Signup {...prop} />
                 }}/>
             ) : ('')}
-            {props.user.kind == 'dealer' || props.user.kind == 'sub-dealer' ? (
+            {props.user.kind === 'dealer' || props.user.kind === 'sub-dealer' ? (
                 <Route exact path={'/track'} render={(prop) => {
                     return <Track {...prop} user={props.user}/>
                 }}/>
             ) : ('')}
-            {props.user.kind == 'dealer' || props.user.kind == 'sub-dealer' ? (
+            {props.user.kind === 'dealer' || props.user.kind === 'sub-dealer' ? (
                 <Route exact path={'/orderform'} render={(prop) => {
                     return <OrdersForm {...prop} user={props.user}/>
                 }}/>
             ) : ('')}
-            {props.user.kind == 'dealer' || props.user.kind == 'sub-dealer' ? (
+            {props.user.kind === 'dealer' || props.user.kind === 'sub-dealer' ? (
                 <Route exact path={'/orderlist'} render={(prop) => {
                     return <OrderList {...prop} user={props.user}/>
                 }}/>
             ) : ('')}
-            {props.user.kind == 'dealer' || props.user.kind == 'admin' ? (
+            {props.user.kind === 'dealer' || props.user.kind === 'admin' ? (
                 <Route exact path={'/userrequest'} render={(prop) => {
                     return <UserRequest {...prop} user={props.user}/>
                 }}/>
@@ -67,9 +67,6 @@ const Routes = (props) => {
                     return <Profile {...prop} user={props.user}/>
                 }}/>
             ) : ('')}
-            {/*<Route path='*' render={(prop) =>{*/}
-            {/*return <Welcome {...prop} user={props.user}/>*/}
-            {/*}}/>*/}
     </Switch>
     )
 };

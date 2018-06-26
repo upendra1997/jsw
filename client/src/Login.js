@@ -17,16 +17,13 @@ class Login extends React.Component {
             return response.json();
         }).then(body => {
             const user = _.pick(body.user, ['_id', 'address', 'contact', 'email', 'kind', 'members', 'name', 'status']);
-            console.log(user);
             if (body.error)
                 messages.add(body.error);
             if (body.message)
                 messages.add(body.message);
             this.setState({messages: messages});
-            console.log(this.props);
             this.props.setUser(user);
         }).catch(e => {
-            console.log(e.stack);
             messages.add("Please fill details properly.");
             messages.add(e);
             this.setState({messages: messages});
@@ -78,12 +75,11 @@ class Login extends React.Component {
                 messages.add(body.message);
             this.setState({messages: messages});
         }).catch(e => {
-            console.log(e.stack);
             messages.add("Please fill details properly.");
             messages.add(e);
             this.setState({messages: messages});
         });
-    }
+    };
     constructor(props) {
         super(props);
         this.state = {

@@ -6,8 +6,8 @@ const logger = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
-const admin = require('./admin')
-const {mongoose,User} = require('./schema/models')
+const admin = require('./admin');
+const {mongoose,User} = require('./schema/models');
 const authRouter = require('./routes/auth');
 const orderRouter = require('./routes/orders');
 const userRouter = require('./routes/users');
@@ -31,9 +31,15 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.use('/', authRouter);
 app.use('/order', orderRouter);
 app.use('/user', userRouter);
+
+/*Load Test for loader.io*/
+app.get('/loaderio-3965ab890c2824ca0063a3061b4430e7',function(req, res){
+    res.sendFile(__dirname+'/loaderio-3965ab890c2824ca0063a3061b4430e7.txt');
+});
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
+/*Load Test*/
 
 const day = 1000 * 60 * 60 * 24;
 /*create ADMIN*/
@@ -54,7 +60,6 @@ user.save().then((a)=>{
 /*End Admin*/
 /*Clean unverified user*/
 setInterval(function(){
-    console.log('clean');
     User.find({}).then((users)=>{
        for(const a of users){
            if( new Date() - a._id.getTimestamp()>= day && a.status=="NotVerified") {

@@ -28,7 +28,7 @@ class OrderHistory extends React.Component {
                 });
             }
         }).catch(e => {
-            console.log(e);
+            console.log(e.message);
         });
     }
 
@@ -42,7 +42,6 @@ class OrderHistory extends React.Component {
         this.state.messages.forEach((error)=>{
             messages.push((<div className={"alert alert-info"}>{error}</div>));
         });
-        const that =this;
         const list  = this.state.list.map(function (data) {
             return (
                 <div className={"card bg-light"}  style={{display: "inline-block"}} id={data._id} key={data._id}>
@@ -66,10 +65,6 @@ class OrderHistory extends React.Component {
                     </div>
                 </div>);
         });
-
-        // const list = this.state.list.map(function (data) {
-        //     list.push(<li key={data.date}>{data.date} {data.message}</li>);
-        // });
 
         return (
             <div align="center" className={"container-fluid gap"}>

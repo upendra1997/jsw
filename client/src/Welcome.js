@@ -22,7 +22,6 @@ class Welcome extends React.Component {
         }).then(response => {
             return response.json();
         }).then(data => {
-            console.log(data);
             if (data.error) {
                 errors.add(data.error);
             }
@@ -53,7 +52,7 @@ class Welcome extends React.Component {
         return (<div>
             <h1>Welcome {this.props.user.name}</h1>
             <h2>to JSW Dealer and Sub-Dealer Portal</h2>
-            <img src={window.location.origin + '/favicon.png'} height={200} width={200}/>
+            <img src={window.location.origin + '/favicon.png'} height={200} width={200} alt={"JSW logo"}/>
             <br/>
             <br/>
             <div className={"card col-md-8 col-xl-11 bg-dark"} style={{color: 'white'}} align="left">

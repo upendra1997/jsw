@@ -6,7 +6,6 @@ class Members extends React.Component {
     };
     data = (user) => {
         if (!user || user.error) {
-            console.log(user);
             return <div></div>
         }
         return (
@@ -25,7 +24,6 @@ class Members extends React.Component {
         this.state = {user: '', jsx: ''};
         const id = this.props.id;
         this.f(id).then((user) => {
-            // console.log(user);
             const jsx = <ul>{user && user.members && user.members.map(id => <Members id={id}/>)}</ul>;
             this.setState({
                 user: this.data(user),
@@ -103,7 +101,7 @@ class Profile extends React.Component {
             headers: {'Content-Type': 'application/json'},
             credentials: 'include',
         }).then((data) => {
-            if (data.status == 200) {
+            if (data.status === 200) {
                 console.log(this.state.password);
                 errors.delete(message);
                 fetch('/changepassword', {
@@ -138,7 +136,6 @@ class Profile extends React.Component {
     }
 
     render() {
-        const that = this;
         const errors = [];
         this.state.errors.forEach((error) => {
             errors.push((<div className={"alert alert-danger"}>{error}</div>));
@@ -148,47 +145,6 @@ class Profile extends React.Component {
         this.state.messages.forEach((error) => {
             messages.push((<div className={"alert alert-info"}>{error}</div>));
         });
-
-        function f(id) {
-            return fetch('/info/' + id).then((user) => user.json()).then((data) => data);
-        }
-
-        //
-        function recursive(id) {
-            const data = f(id);
-            return (
-                <div>
-                    Name: {data.name}<br/>
-                    Email: {data.email}<br/>
-                    Phone: {data.contact}<br/>
-                    Address: {data.address}<br/>
-                    kind: {data.kind}<br/>
-                </div>
-            );
-        }
-
-        // function print(){
-        //     const admin = that.props.user.members((admin)=>{
-        //         let dealer=f(admin).members.map((dealer)=>{
-        //             let subdealer=f(dealer).members.map((subdealer)=>{
-        //                 return recursive(subdealer);
-        //             });
-        //             return (<div>{recursive(dealer)}{subdealer}</div>);
-        //         });
-        //         return (<div>{recursive(admin)}{dealer}</div>);
-        //     });
-        //     return admin;
-        // };
-        // console.log(recursive(this.props.user._id));
-        //
-        // function members(id){
-        //     const user = f(id);
-        //     if(!user.members) return recursive(id);
-        //     const mem = user.members.map((m)=>{
-        //         return members(m);
-        //     });
-        //     return (<div>{mem}</div>);
-        // }
 
         return (
             <div align="center" className={"container-fluid gap"}>

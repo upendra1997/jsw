@@ -16,7 +16,6 @@ class Track extends React.Component {
         }).then(response => {
             return response.json();
         }).then(data => {
-            console.log(data);
             if (data.error) {
                 errors.add(data.error);
             }
@@ -45,24 +44,6 @@ class Track extends React.Component {
         this.state.messages.forEach((error)=>{
             messages.push((<li key={error}>{error}</li>));
         });
-        const that = this;
-        // const list  = this.state.list.map(function (data) {
-        //     return (<li id={data._id} key={data._id}>
-        //         <div>
-        //             <label>Order ID: {data._id}</label><br />
-        //             <label>Contact Name: {data.name}</label><br />
-        //             <label>Contact Number: {data.contact}</label><br />
-        //             <label>Address: {data.address}</label><br />
-        //             <label>PIN Code: {data.pincode}</label><br />
-        //             {(data.GST)?<label>GST: {data.GST}</label>:''}{(data.GST)?<br/>:''}
-        //             <label>Material Type: {data.materialType}</label><br />
-        //             <label>Quantity: {data.quantity}</label><br />
-        //             <label>Current Location: {data.location}</label><br />
-        //             <label>Driver Name: {data.driver.name}</label><br />
-        //             <label>Driver Contact: {data.driver.contact}</label><br />
-        //         </div>
-        //     </li>);
-        // });
         const list  = this.state.list.map(function (data) {
             return (
                 <div className={"card bg-light"} style={{display: "inline-block"}} id={data._id} key={data._id}>
